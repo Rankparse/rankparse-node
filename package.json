@@ -1,0 +1,35 @@
+{
+  "name": "rankparse",
+  "version": "0.1.0",
+  "description": "Official Node.js SDK for the RankParse SEO API",
+  "license": "MIT",
+  "author": "RankParse",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abhibavishi/rankparse-node"
+  },
+  "keywords": ["seo", "backlinks", "api", "rankparse"],
+  "engines": { "node": ">=18" },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
