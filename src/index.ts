@@ -20,6 +20,7 @@ import type {
   DomainOverlapRow,
   SimilarDomainRow,
   CompetitorGapRow,
+  LinkAuditData,
   LinkAuditResponse,
   SiteExplorerRow,
   PageSeoData,
@@ -53,6 +54,7 @@ export type {
   DomainOverlapRow,
   SimilarDomainRow,
   CompetitorGapRow,
+  LinkAuditData,
   LinkAuditResponse,
   SiteExplorerRow,
   PageSeoData,
@@ -108,8 +110,9 @@ export class RankParse {
       }
     }
 
+    let timedOut = false;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeout);
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, this.timeout);
 
     const headers: Record<string, string> = {
       'X-API-Key': this.apiKey,
@@ -128,6 +131,11 @@ export class RankParse {
         body: body !== undefined ? JSON.stringify(body) : undefined,
         signal: controller.signal,
       });
+    } catch (err) {
+      if (timedOut) {
+        throw new APIError(`Request timed out after ${this.timeout}ms`, 'timeout', 0);
+      }
+      throw err;
     } finally {
       clearTimeout(timer);
     }
@@ -278,8 +286,25 @@ export class RankParse {
     });
   }
 
-  async linkAudit(domain: string): Promise<LinkAuditResponse> {
-    return this.request('GET', '/link-audit', { domain });
+  async linkAudit(domain: string): Promise<ApiResponse<LinkAuditData>> {
+    const raw = await this.request<Record<string, unknown>>('GET', '/link-audit', { domain });
+    // The API returns a flat object — extract envelope fields to match ApiResponse<T> shape
+    const { credits_used, credits_remaining, crawl_release, cached, domain: d, ...data } = raw as {
+      credits_used: number;
+      credits_remaining: number;
+      crawl_release?: string;
+      cached?: boolean;
+      domain: string;
+      [key: string]: unknown;
+    };
+    return {
+      domain: d,
+      data: data as unknown as LinkAuditData,
+      credits_used,
+      credits_remaining,
+      crawl_release,
+      cached,
+    };
   }
 
   async siteExplorer(

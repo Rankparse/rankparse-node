@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { RankParse, AuthError, InsufficientCreditsError, RateLimitError, APIError } from '../src/index.js';
+import { RankParse, AuthError, InsufficientCreditsError, NotFoundError, RateLimitError, APIError } from '../src/index.js';
 
 const BASE_URL = 'https://api.rankparse.com/v1';
 const API_KEY = 'rp_testkey1234567890';
@@ -69,21 +69,28 @@ describe('RankParse SDK', () => {
     await expect(client.backlinks('example.com')).rejects.toBeInstanceOf(InsufficientCreditsError);
   });
 
-  // 5. 429 -> RateLimitError
+  // 5. 404 -> NotFoundError
+  it('throws NotFoundError on 404', async () => {
+    vi.stubGlobal('fetch', mockFetch(makeErrorResponse(404, 'not_found', 'Not found')));
+
+    await expect(client.domainAuthority('missing.com')).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  // 6. 429 -> RateLimitError
   it('throws RateLimitError on 429', async () => {
     vi.stubGlobal('fetch', mockFetch(makeErrorResponse(429, 'rate_limited', 'Rate limit exceeded')));
 
     await expect(client.backlinks('example.com')).rejects.toBeInstanceOf(RateLimitError);
   });
 
-  // 6. 500 -> APIError
+  // 7. 500 -> APIError
   it('throws APIError on 500', async () => {
     vi.stubGlobal('fetch', mockFetch(makeErrorResponse(500, 'internal_error', 'Internal server error')));
 
     await expect(client.backlinks('example.com')).rejects.toBeInstanceOf(APIError);
   });
 
-  // 7. backlinks() happy path
+  // 8. backlinks() happy path
   it('returns correct shape on backlinks() happy path', async () => {
     const mockData = {
       data: [
@@ -113,7 +120,7 @@ describe('RankParse SDK', () => {
     expect(result.data[0].from_domain).toBe('other.com');
   });
 
-  // 8. domainOverlap() array param — joined with comma, not bracket notation
+  // 9. domainOverlap() array param — joined with comma, not bracket notation
   it('sends domains as comma-joined string for domainOverlap()', async () => {
     const fetchMock = mockFetch(makeOkResponse({ data: [], credits_used: 5, credits_remaining: 95 }));
     vi.stubGlobal('fetch', fetchMock);
@@ -126,7 +133,7 @@ describe('RankParse SDK', () => {
     expect(parsed.searchParams.has('domains[]')).toBe(false);
   });
 
-  // 9. linkIntersect() two domain params
+  // 10. linkIntersect() two domain params
   it('sends domain_a and domain_b for linkIntersect()', async () => {
     const fetchMock = mockFetch(makeOkResponse({ data: [], credits_used: 5, credits_remaining: 95 }));
     vi.stubGlobal('fetch', fetchMock);
@@ -139,7 +146,7 @@ describe('RankParse SDK', () => {
     expect(parsed.searchParams.get('domain_b')).toBe('y.com');
   });
 
-  // 10. batch() POST body
+  // 11. batch() POST body
   it('sends POST with JSON body for batch()', async () => {
     const mockBatchResponse = {
       results: [],
@@ -159,7 +166,7 @@ describe('RankParse SDK', () => {
     expect(parsedBody.requests).toEqual(requests);
   });
 
-  // 11. revokeKey() DELETE
+  // 12. revokeKey() DELETE
   it('uses DELETE method for revokeKey()', async () => {
     const fetchMock = mockFetch(makeOkResponse({ success: true }));
     vi.stubGlobal('fetch', fetchMock);

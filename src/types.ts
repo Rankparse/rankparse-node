@@ -88,8 +88,7 @@ export interface CompetitorGapRow {
   links_to_target: number;
 }
 
-export interface LinkAuditResponse {
-  domain: string;
+export interface LinkAuditData {
   total_backlinks: number;
   total_referring_domains: number;
   nofollow_count: number;
@@ -97,6 +96,11 @@ export interface LinkAuditResponse {
   sponsored_count: number;
   ugc_count: number;
   top_anchors: AnchorTextRow[];
+}
+
+/** @deprecated Use LinkAuditData wrapped in ApiResponse<LinkAuditData> instead */
+export interface LinkAuditResponse extends LinkAuditData {
+  domain: string;
   credits_used: number;
   credits_remaining: number;
 }
