@@ -149,21 +149,21 @@ describe('RankParse SDK', () => {
   // 11. batch() POST body
   it('sends POST with JSON body for batch()', async () => {
     const mockBatchResponse = {
-      results: [],
-      total_credits_used: 0,
+      data: [{ domain: 'example.com', success: true, data: [], total: 0 }],
+      credits_used: 2,
       credits_remaining: 100,
     };
     const fetchMock = mockFetch(makeOkResponse(mockBatchResponse));
     vi.stubGlobal('fetch', fetchMock);
 
-    const requests = [{ endpoint: '/backlinks', params: { domain: 'example.com' } }];
-    await client.batch(requests);
+    const domains = ['example.com'];
+    await client.batch(domains);
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(init.method).toBe('POST');
     expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
-    const parsedBody = JSON.parse(init.body as string) as { requests: typeof requests };
-    expect(parsedBody.requests).toEqual(requests);
+    const parsedBody = JSON.parse(init.body as string) as { domains: typeof domains };
+    expect(parsedBody.domains).toEqual(domains);
   });
 
   // 12. revokeKey() DELETE

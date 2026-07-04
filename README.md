@@ -67,7 +67,7 @@ All methods return a `Promise`. Paginated endpoints accept `{ limit?, offset? }`
 |---|---|---|---|
 | `pageSeo(url)` | Title, description, OG tags, canonical | — | 2 |
 | `pagePerformance(url, opts?)` | Core Web Vitals via PageSpeed Insights | `strategy` (mobile/desktop) | 3 |
-| `techStack(url)` | Detected technologies and frameworks | — | 2 |
+| `techStack(domain)` | Detected technologies and frameworks | — | 2 |
 | `siteHealth(domain)` | Status codes and content-type distribution | — | 2 |
 | `sitemap(domain)` | Sitemap URLs found for a domain | — | 2 |
 | `crawlHistory(domain, opts?)` | Crawl snapshot history | `limit`, `offset` | 2 |
@@ -79,7 +79,11 @@ All methods return a `Promise`. Paginated endpoints accept `{ limit?, offset? }`
 
 | Method | Description | Credits |
 |---|---|---|
-| `batch(requests[])` | Run multiple endpoint calls in one request | sum of individual costs |
+| `batch(domains[])` | Backlink lookup for up to 50 domains in one request | 2 per domain |
+
+```ts
+const result = await client.batch(['github.com', 'stripe.com']);
+```
 
 ### Dashboard (no credit cost)
 

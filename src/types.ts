@@ -186,20 +186,12 @@ export interface TopPageRow {
   estimated_traffic: number | null;
 }
 
-export interface BatchRequest {
-  endpoint: string;
-  params: Record<string, string | number | boolean>;
-}
-
-export interface BatchResponse {
-  results: Array<{
-    endpoint: string;
-    data: unknown;
-    error?: string;
-    credits_used: number;
-  }>;
-  total_credits_used: number;
-  credits_remaining: number;
+export interface BatchResultItem {
+  domain: string;
+  data?: BacklinkRow[];
+  total?: number;
+  success: boolean;
+  error?: string;
 }
 
 export interface UserProfile {

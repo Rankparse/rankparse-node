@@ -31,8 +31,7 @@ import type {
   CrawlHistoryRow,
   InternalLinkRow,
   TopPageRow,
-  BatchRequest,
-  BatchResponse,
+  BatchResultItem,
   UserProfile,
   ApiKey,
   CreatedKey,
@@ -65,8 +64,7 @@ export type {
   CrawlHistoryRow,
   InternalLinkRow,
   TopPageRow,
-  BatchRequest,
-  BatchResponse,
+  BatchResultItem,
   UserProfile,
   ApiKey,
   CreatedKey,
@@ -335,8 +333,8 @@ export class RankParse {
     });
   }
 
-  async techStack(url: string): Promise<ApiResponse<TechStackData>> {
-    return this.request('GET', '/tech-stack', { url });
+  async techStack(domain: string): Promise<ApiResponse<TechStackData>> {
+    return this.request('GET', '/tech-stack', { domain });
   }
 
   async siteHealth(domain: string): Promise<ApiResponse<SiteHealthData>> {
@@ -387,8 +385,8 @@ export class RankParse {
   // Batch
   // ---------------------------------------------------------------------------
 
-  async batch(requests: BatchRequest[]): Promise<BatchResponse> {
-    return this.request('POST', '/batch', undefined, { requests });
+  async batch(domains: string[]): Promise<ApiResponse<BatchResultItem[]>> {
+    return this.request('POST', '/batch', undefined, { domains });
   }
 
   // ---------------------------------------------------------------------------
