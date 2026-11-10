@@ -27,8 +27,14 @@ import type {
   PagePerformanceData,
   TechStackData,
   SiteHealthData,
-  SitemapData,
-  CrawlHistoryRow,
+  TechCategory,
+  TechEntry,
+  SiteHealthCheck,
+  SitemapEntry,
+  SitemapResponse,
+  CrawlHistoryData,
+  SchemaMarkupEntity,
+  SchemaMarkupResponse,
   InternalLinkRow,
   TopPageRow,
   BatchResultItem,
@@ -60,8 +66,14 @@ export type {
   PagePerformanceData,
   TechStackData,
   SiteHealthData,
-  SitemapData,
-  CrawlHistoryRow,
+  TechCategory,
+  TechEntry,
+  SiteHealthCheck,
+  SitemapEntry,
+  SitemapResponse,
+  CrawlHistoryData,
+  SchemaMarkupEntity,
+  SchemaMarkupResponse,
   InternalLinkRow,
   TopPageRow,
   BatchResultItem,
@@ -341,14 +353,14 @@ export class RankParse {
     return this.request('GET', '/site-health', { domain });
   }
 
-  async sitemap(domain: string): Promise<ApiResponse<SitemapData>> {
+  async sitemap(domain: string): Promise<SitemapResponse> {
     return this.request('GET', '/sitemap', { domain });
   }
 
   async crawlHistory(
     domain: string,
     opts?: PaginatedOptions
-  ): Promise<ApiResponse<CrawlHistoryRow[]>> {
+  ): Promise<ApiResponse<CrawlHistoryData>> {
     return this.request('GET', '/crawl-history', {
       domain,
       limit: opts?.limit,
@@ -356,7 +368,7 @@ export class RankParse {
     });
   }
 
-  async schemaMarkup(url: string): Promise<ApiResponse<unknown>> {
+  async schemaMarkup(url: string): Promise<SchemaMarkupResponse> {
     return this.request('GET', '/schema-markup', { url });
   }
 
