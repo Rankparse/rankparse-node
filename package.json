@@ -6,7 +6,7 @@
   "author": "RankParse",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abhibavishi/rankparse-node"
+    "url": "https://github.com/Rankparse/rankparse-node"
   },
   "keywords": ["seo", "backlinks", "api", "rankparse"],
   "engines": { "node": ">=18" },
