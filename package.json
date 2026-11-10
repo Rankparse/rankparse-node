@@ -1,6 +1,6 @@
 {
   "name": "rankparse",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Official Node.js SDK for the RankParse SEO API",
   "license": "MIT",
   "author": "RankParse",
@@ -28,8 +28,8 @@
     "prepublishOnly": "npm run build && npm test"
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
+    "tsup": "^9.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0"
+    "vitest": "^5.1.0"
   }
 }
