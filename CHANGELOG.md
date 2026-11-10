@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 - 2026-11-10
+
+- Added: `LICENSE` file (MIT). 0.2.0 and earlier declared MIT in `package.json` but shipped no license text.
+- Changed: the published `.d.ts` files group type exports as `export type { ... }` instead of inline `type` modifiers. The exported names are unchanged.
+- Dev dependencies: upgraded `vitest` to 5.x and `tsup` to 9.x, which clears all `npm audit` findings (they were dev-only and never shipped in the package). No runtime changes. The build and test tooling now needs Node 22.18 or newer, so CI runs on Node 22 (Node 20 is end of life). The package itself still declares `engines: node >=18`.
+
 ## 0.2.0 - 2026-11-10
 
 - **Breaking (types only): response types for page and site endpoints now match the live API.** The old declarations described fields the API never returned, so reading them gave `undefined` at runtime and no runtime behaviour changes, but code that referenced the old fields will stop compiling:
