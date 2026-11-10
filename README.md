@@ -65,13 +65,13 @@ All methods return a `Promise`. Paginated endpoints accept `{ limit?, offset? }`
 
 | Method | Description | Params | Credits |
 |---|---|---|---|
-| `pageSeo(url)` | Title, description, OG tags, canonical | — | 2 |
+| `pageSeo(url)` | Live on-page audit: title, description, canonical, robots, headings, OG/Twitter, JSON-LD, images, links | — | 3 |
 | `pagePerformance(url, opts?)` | Core Web Vitals via PageSpeed Insights | `strategy` (mobile/desktop) | 3 |
-| `techStack(domain)` | Detected technologies and frameworks | — | 2 |
-| `siteHealth(domain)` | Status codes and content-type distribution | — | 2 |
-| `sitemap(domain)` | Sitemap URLs found for a domain | — | 2 |
-| `crawlHistory(domain, opts?)` | Crawl snapshot history | `limit`, `offset` | 2 |
-| `schemaMarkup(url)` | Schema.org markup detected on page | — | 2 |
+| `techStack(domain)` | Detected technologies, `Server` and `X-Powered-By` | — | 2 |
+| `siteHealth(domain)` | Live check: HTTPS/HSTS, www redirect, security headers, robots.txt | — | 2 |
+| `sitemap(domain)` | Sitemap entries found for a domain (the API also accepts `limit`, default 100, max 1000) | — | 2 (0 if none found) |
+| `crawlHistory(domain)` | Wayback Machine first/last seen and snapshot count | — | 2 |
+| `schemaMarkup(url)` | JSON-LD entities on the page, including `@graph` | — | 2 |
 | `internalLinks(url, opts?)` | Internal link graph for a page | `limit`, `offset` | 2 |
 | `topPages(domain, opts?)` | Top pages by estimated traffic | `limit` | 2 |
 
@@ -96,6 +96,37 @@ const result = await client.batch(['github.com', 'stripe.com']);
 | `revokeKey(keyId)` | Revoke an API key |
 | `usage(opts?)` | Paginated usage logs |
 | `checkout(packId)` | Create a Stripe checkout session for a credit pack |
+
+## Page and site examples
+
+These endpoints return nested objects, so read fields through them (`data.title.text`, not `data.title`).
+
+```ts
+const seo = await client.pageSeo('https://stripe.com/about');
+console.log(seo.data.title.text, seo.data.title.optimal); // 'About Stripe', false
+console.log(seo.data.canonical.self_referential);          // true
+console.log(seo.data.headings.h1);                         // ['About Stripe']
+console.log(seo.data.images.missing_alt);                  // 2
+
+const perf = await client.pagePerformance('https://stripe.com', { strategy: 'desktop' });
+console.log(perf.data.performance_score);                  // 87
+console.log(perf.data.core_web_vitals.lcp_ms);             // 1834.5 (null when Google omits it)
+console.log(perf.data.crux_data);                          // true when real-user data exists
+
+const tech = await client.techStack('example.com');
+tech.data.technologies.forEach((t) => console.log(t.name, t.category, t.confidence));
+console.log(tech.data.server);                             // 'cloudflare'
+
+const health = await client.siteHealth('example.com');
+console.log(health.data.https.enforced, health.data.robots_txt.present);
+
+// sitemap() and schemaMarkup() put the list in `data` and extra details beside it.
+const sm = await client.sitemap('example.com');
+console.log(sm.data.length, sm.total, sm.sitemap_url, sm.truncated);
+
+const history = await client.crawlHistory('example.com');
+console.log(history.data.first_seen, history.data.total_snapshots);
+```
 
 ## Response Envelope
 
@@ -158,7 +189,7 @@ All error classes extend `RankParseError` which has:
 The SDK ships full TypeScript types. All response shapes are exported from the package root:
 
 ```ts
-import type { BacklinkRow, DomainAuthorityData, ApiResponse } from 'rankparse';
+import type { BacklinkRow, DomainAuthorityData, PageSeoData, ApiResponse } from 'rankparse';
 ```
 
 ## License
