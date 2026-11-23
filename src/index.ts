@@ -26,6 +26,7 @@ import type {
   PageSeoData,
   PagePerformanceData,
   TechStackData,
+  SitePlatformData,
   SiteHealthData,
   TechCategory,
   TechEntry,
@@ -65,6 +66,7 @@ export type {
   PageSeoData,
   PagePerformanceData,
   TechStackData,
+  SitePlatformData,
   SiteHealthData,
   TechCategory,
   TechEntry,
@@ -347,6 +349,11 @@ export class RankParse {
 
   async techStack(domain: string): Promise<ApiResponse<TechStackData>> {
     return this.request('GET', '/tech-stack', { domain });
+  }
+
+  /** What the site runs on (WordPress, Wix, Shopify, ...), from one live page fetch. 1 credit; see `techStack` for the full stack. */
+  async sitePlatform(domain: string): Promise<ApiResponse<SitePlatformData>> {
+    return this.request('GET', '/site-platform', { domain });
   }
 
   async siteHealth(domain: string): Promise<ApiResponse<SiteHealthData>> {

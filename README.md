@@ -68,6 +68,7 @@ All methods return a `Promise`. Paginated endpoints accept `{ limit?, offset? }`
 | `pageSeo(url)` | Live on-page audit: title, description, canonical, robots, headings, OG/Twitter, JSON-LD, images, links | — | 3 |
 | `pagePerformance(url, opts?)` | Core Web Vitals via PageSpeed Insights | `strategy` (mobile/desktop) | 3 |
 | `techStack(domain)` | Detected technologies, `Server` and `X-Powered-By` | — | 2 |
+| `sitePlatform(domain)` | The platform the site runs on (WordPress, Wix, Shopify, ...) plus commerce add-ons, from one live fetch | — | 1 |
 | `siteHealth(domain)` | Live check: HTTPS/HSTS, www redirect, security headers, robots.txt | — | 2 |
 | `sitemap(domain)` | Sitemap entries found for a domain (the API also accepts `limit`, default 100, max 1000) | — | 2 (0 if none found) |
 | `crawlHistory(domain)` | Wayback Machine first/last seen and snapshot count | — | 2 |
@@ -116,6 +117,11 @@ console.log(perf.data.crux_data);                          // true when real-use
 const tech = await client.techStack('example.com');
 tech.data.technologies.forEach((t) => console.log(t.name, t.category, t.confidence));
 console.log(tech.data.server);                             // 'cloudflare'
+
+// Only need the platform? sitePlatform() is half the price of techStack().
+const sp = await client.sitePlatform('example.com');
+console.log(sp.data.platform?.name);                       // 'WordPress' (null when none recognised)
+console.log(sp.data.add_ons.map((a) => a.name));           // ['WooCommerce']
 
 const health = await client.siteHealth('example.com');
 console.log(health.data.https.enforced, health.data.robots_txt.present);

@@ -198,6 +198,27 @@ export interface TechStackData {
   response_time_ms: number;
 }
 
+export interface SitePlatformData {
+  domain: string;
+  /** The one platform the home page shows, or null when the page matches none we recognise. */
+  platform: {
+    name: string;
+    category: TechCategory;
+    confidence: 'definite' | 'high' | 'medium';
+    /** The marker that matched, for example `/wp-content/`; null when none is recorded. */
+    evidence: string | null;
+  } | null;
+  /** Other platforms the same page also matched (normally empty). */
+  other_platforms: string[];
+  /** Commerce items that run on top of a platform, for example WooCommerce on WordPress. */
+  add_ons: Array<{
+    name: string;
+    category: TechCategory;
+    confidence: 'definite' | 'high' | 'medium';
+  }>;
+  response_time_ms: number;
+}
+
 export interface SiteHealthCheck {
   url: string;
   /** null when the request failed. */
