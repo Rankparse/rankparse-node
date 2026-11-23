@@ -8,6 +8,7 @@ import type {
   SchemaMarkupResponse,
   SiteHealthData,
   SitemapResponse,
+  SitePlatformData,
   TechStackData,
 } from '../src/index.js';
 
@@ -142,6 +143,45 @@ describe('response shapes match the live API', () => {
     expect(res.data.x_powered_by).toBeNull();
     expect(res.data.response_time_ms).toBe(240);
     expect(res.data.technologies[0]).not.toHaveProperty('version');
+  });
+
+  it('sitePlatform() returns the platform, other platforms and commerce add-ons', async () => {
+    const body: ApiResponse<SitePlatformData> = {
+      domain: 'example.com',
+      data: {
+        domain: 'example.com',
+        platform: { name: 'WordPress', category: 'cms', confidence: 'definite', evidence: '/wp-content/' },
+        other_platforms: [],
+        add_ons: [{ name: 'WooCommerce', category: 'ecommerce', confidence: 'definite' }],
+        response_time_ms: 310,
+      },
+      credits_used: 1,
+      credits_remaining: 99,
+    };
+    const fetchMock = respondWith(body);
+
+    const res = await client.sitePlatform('example.com');
+
+    const [url] = fetchMock.mock.calls[0] as [string];
+    expect(new URL(url).pathname).toBe('/v1/site-platform');
+    expect(new URL(url).searchParams.get('domain')).toBe('example.com');
+    expect(res.data.platform?.name).toBe('WordPress');
+    expect(res.data.add_ons[0]?.name).toBe('WooCommerce');
+    expect(res.credits_used).toBe(1);
+  });
+
+  it('sitePlatform() answers platform: null when the page matches none', async () => {
+    const body: ApiResponse<SitePlatformData> = {
+      domain: 'example.com',
+      data: { domain: 'example.com', platform: null, other_platforms: [], add_ons: [], response_time_ms: 120 },
+      credits_used: 1,
+      credits_remaining: 98,
+    };
+    respondWith(body);
+
+    const res = await client.sitePlatform('example.com');
+
+    expect(res.data.platform).toBeNull();
   });
 
   it('siteHealth() returns https, www_redirect, checks, security_headers and robots_txt', async () => {
