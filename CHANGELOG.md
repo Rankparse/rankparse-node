@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 - 2026-11-23
 
 - Added: `sitePlatform(domain)` for `GET /v1/site-platform`. It reads the home page once, live, and returns the single platform the site runs on (WordPress, Wix, Shopify, Squarespace, Webflow and so on), any `other_platforms`, and commerce `add_ons` such as WooCommerce. 1 credit, half the price of `techStack()`. A page that matches no platform returns `platform: null` and is charged; an unreadable site returns a 503 and is not charged. New `SitePlatformData` type.
 
